@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chu</title>
+    <link href="/static/style.css" rel="stylesheet">
+</head>
+
+<body>
+      <h1>Chao mung ban dem website cua toi</h1>
+      <h1>{{message}}</h1>
+        <form method="get" action="">
+             <input type="text" name="keyword" placeholder="Nhap tu khoa tim kiem..."/>
+            <input type="submit" value="Tim kiem"/>
+
+        </form>
+      <hr>
+       <form method="post" action="\login">
+             <input type="text" name="username" placeholder="Nhap username..."/>
+           <input type="password" name="password" placeholder="Nhap mat khau..."/>
+            <input type="submit" value="dang nhap"/>
+
+        </form>
+     </hr>
+      <hr>
+          <form method="post" enctype="multipart/form-data" action="\uploadFile">
+              <input type="file" name="image"/>
+              <input type="submit" value="Upload"/>
+          </form>
+      </hr>
+    <ul>
+
+            {% for u in users %}
+            <li>{{u.name}} - {{u.phone}}</li>
+             {% endfor %}
+
+    </ul>
+</body>
+</html>
