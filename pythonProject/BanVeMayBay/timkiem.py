@@ -1,6 +1,6 @@
 from flask import render_template, request
 import os
-from Backend_ATTT.pythonProject.BanVeMayBay import app
+from pythonProject.BanVeMayBay import app
 
 
 @app.route("/")

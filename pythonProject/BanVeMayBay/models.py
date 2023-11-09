@@ -1,7 +1,8 @@
+from flask_login import UserMixin
 from sqlalchemy import Integer, Column, String, Boolean, DateTime, Float, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
-from Backend_ATTT.pythonProject.BanVeMayBay import db, app
+from pythonProject.BanVeMayBay import db, app
 
 
 # doi vs 1 N thi ben phia ben co 1 se thiet lap relationship con phia ben N se thiet lap khoa ngoai
@@ -27,63 +28,113 @@ from Backend_ATTT.pythonProject.BanVeMayBay import db, app
 #     name = Column(String(20), nullable=False)
 
 class ChuyenBay(db.Model):
-    __tablename__ = 'ChuyenBay'
-    MaCB = Column(String(20), primary_key=True)
+    MaCB = Column(Integer, primary_key=True)
     tenCB = Column(String(25), nullable=False)
     GaDi = Column(String(30), nullable=False)
     GaDen = Column(String(30), nullable=False)
     GiaVe = Column(Float, nullable=False)
-    SoLuongCho = Column(Integer, nullable=False)  # hôm nay bán 30 vé vs cb VN102
+    SoLuongCho = Column(Integer, nullable=False)
+    cb_lb = relationship("CB_LB", backref="ChuyenBay")
+    vemaybay = relationship("VeMayBay", backref="ChuyenBay", lazy=True)
 
 
-class VeMayBay(db.Model):
-    MaVe = Column(String(20), primary_key=True)
-    NgDat = Column(DateTime, nullable=False)
-    SoGhe = Column(Integer, nullable=False, unique=True)
-    SoCua = Column(Integer, nullable=False)
-    TinhTrangVe = Column(Boolean, nullable=False)
+class LichBay(db.Model):
+    MaLichBay = Column(Integer, primary_key=True, autoincrement=True)
+    GioDi = Column(DateTime, nullable=False)
+    GioVe = Column(DateTime, nullable=False)
+    cb_lb = relationship("CB_LB", backref="LichBay")
 
 
-class PhieuThanhToan(db.Model):
-    MaThanhToan = Column(String(20), primary_key=True)
-    SoLuongVeDat = Column(Integer, nullable=False)
-    ThanhTien = Column(Float, nullable=False)
-    NgLapThanhToan = Column(DateTime, nullable=False)
-    NgHetHanThanhToan = Column(DateTime, nullable=False)
+class CB_LB(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    chuyenbay_id = Column(Integer, ForeignKey(ChuyenBay.MaCB))
+    lichbay_id = Column(Integer, ForeignKey(LichBay.MaLichBay))
 
 
 class KhachHang(db.Model):
-    MaKH = Column(String(20), primary_key=True)
+    MaKH = Column(Integer, primary_key=True)
     CCCD = Column(String(12), nullable=False, unique=True)
     GioiTinh = Column(Boolean, nullable=False)
     HoTen = Column(String(30), nullable=False)
     SDT = Column(String(15), unique=True)
     NgSinh = Column(DateTime, nullable=False)
+    vemaybay = relationship("VeMayBay", backref="KhachHang", lazy=True)
+    taikhoanthanhtoan = relationship("TaiKhoanThanhToan", backref="KhachHang", lazy=True)
+
+
+class PhieuThanhToan(db.Model):
+    MaThanhToan = Column(Integer, primary_key=True)
+    SoLuongVeDat = Column(Integer, nullable=False)
+    ThanhTien = Column(Float, nullable=False)
+    NgLapThanhToan = Column(DateTime, nullable=False)
+    NgHetHanThanhToan = Column(DateTime, nullable=False)
+    vemaybay = relationship("VeMayBay", backref="PhieuThanhToan", lazy=True)
 
 
 class TaiKhoanThanhToan(db.Model):
-    SoTK = Column(String(20), primary_key=True)
+    SoTK = Column(Integer, primary_key=True)
     TenNganHang = Column(String(50), nullable=True)
     Loai = Column(String(30), nullable=False)
+    khachhang_id = Column(Integer, ForeignKey(KhachHang.MaKH), nullable=False)
+
+
+class VeMayBay(db.Model):
+    MaVe = Column(Integer, primary_key=True)
+    NgDat = Column(DateTime, nullable=False)
+    SoGhe = Column(Integer, nullable=False, unique=True)
+    SoCua = Column(Integer, nullable=False)
+    TinhTrangVe = Column(Boolean, nullable=False)
+    chuyenbay_id = Column(Integer, ForeignKey(ChuyenBay.MaCB), nullable=False)
+    khachhang_id = Column(Integer, ForeignKey(KhachHang.MaKH), nullable=False)
+    phieuthanhtoan_id = Column(Integer, ForeignKey(PhieuThanhToan.MaThanhToan), nullable=False)
+    # ve_datcho = relationship(" Ve_DatCho", backref="VeMayBay")
 
 
 class PhieuDatCho(db.Model):
-    MaPhieu = Column(String(20), primary_key=True)
+    MaPhieu = Column(Integer, primary_key=True)
     LoaiVe = Column(String(20), nullable=False)
     NgMua = Column(DateTime, nullable=False)
     TrangThai = Column(String(20), nullable=False)
+    ve_datcho = relationship("Ve_DatCho", backref="PhieuDatCho",lazy=True)
+
+
+class Ve_DatCho(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    vemaybay_id = Column(Integer, ForeignKey(VeMayBay.MaVe))
+    phieudatcho_id = Column(Integer, ForeignKey(PhieuDatCho.MaPhieu),nullable=False)
 
 
 class DaiLy(db.Model):
-    MaDaiLy = Column(String(20), primary_key=True)
+    MaDaiLy = Column(Integer, primary_key=True)
     Ten = Column(String(20), nullable=False)
+    taikhoandaily = relationship("TaiKhoanDaiLy", backref="Daily", uselist=False)
 
 
 class TaiKhoanDaiLy(db.Model):
+    TK_DaiLy_ID = Column(Integer, primary_key=True, autoincrement=True)
     TenTK = Column(String(30), nullable=False)
     MatKhau = Column(String(30), nullable=False)
-# class Lichbay(db.Model):
-#     pass
-#
-# class MayBay():
-#     pass
+    daily_id = Column(Integer, ForeignKey(DaiLy.MaDaiLy), nullable=False)
+
+
+class User(db.Model, UserMixin):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), nullable=False, unique=True)
+    username = Column(String(50), nullable=False, unique=True)
+    password = Column(String(100), nullable=False)
+    avatar = Column(String(100),
+                    default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1688179242/hclq65mc6so7vdrbp7hz.jpg')
+
+    def __str__(self):
+        return self.name
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+
+        import hashlib
+        # u = User(name='Admin', username='admin', password=str(12345))
+        # db.session.add(u)
+        # db.session.commit()
+
