@@ -28,10 +28,6 @@ class StatsView(BaseView):
     def index(self):
         return self.render('admin/stats.html')
 
-class CongraView(BaseView):
-    @expose("/")
-    def index(self):
-        return self.render('admin/congratulation.html')
 
 admin.add_view(StatsView(name='Thống kê báo cáo'))
 
